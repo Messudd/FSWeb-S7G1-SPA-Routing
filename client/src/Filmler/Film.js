@@ -2,33 +2,36 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function Film(props) {
+  const {idnum , ekleFunc} = props;
   const [movie, setMovie] = useState();
 
-  let id = 1;
-  // URL'den alınan :id parametresini bu değişkene aktarın
+
+  const idFilmInfo = async(param) => {
+
+    const data = await axios
+    .get(`http://localhost:5001/api/filmler/${param}`) 
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+    });
+    setMovie(data);
+   }
+
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5001/api/filmler/${id}`) // Bu uç noktayı Postman'le çalışın
-      .then(response => {
-          // Bu kısmı log statementlarıyla çalışın
-          // ve burdan gelen response'u 'movie' e aktarın
-      })
-      .catch(error => {
-        console.error(error);
-      });
-    // Bu effect her `id ` değiştiğinde çalışmalı
-    // Bunu nasıl gerçekleştirebiliriz?
-  }, []);
+    idFilmInfo(idnum);
+  },[idnum])
 
-  // Yalnızca esnek görevlere geçtiğinizde burdaki yorum etiketini kaldırın
-  // const filmiKaydet = evt => { }
+  console.log('movie_Info : ',movie);
+
 
   if (!movie) {
     return <div>Film bilgisi yükleniyor...</div>;
   }
 
-  const { title, director, metascore, stars } = movie;
+  const { title, director, metascore, stars} = movie;
 
   return (
     <div className="save-wrapper">
@@ -48,7 +51,7 @@ export default function Film(props) {
           </div>
         ))}
       </div>
-      <div className="save-button">Kaydet</div>
+      <div style={{cursor:'pointer'}} onClick={() => {ekleFunc(movie)}} className="save-button">Kaydet</div>
     </div>
   );
 }
